@@ -5,10 +5,7 @@ if (!uri) {
   throw new Error('Please define the MONGODB_URI environment variable in .env.local');
 }
 
-let client: MongoClient;
-let clientPromise: Promise<MongoClient>;
-
-client = new MongoClient(uri);
-clientPromise = client.connect();
+const client: MongoClient = new MongoClient(uri);
+const clientPromise: Promise<MongoClient> = client.connect();
 
 export default clientPromise;
