@@ -12,7 +12,6 @@ const client = new MongoClient(uri, options);
 
 // 2️⃣ Cache the connection promise on global (only in dev)
 declare global {
-  // eslint-disable-next-line no-var
   var _mongoClientPromise: Promise<MongoClient>;
 }
 const clientPromise: Promise<MongoClient> =

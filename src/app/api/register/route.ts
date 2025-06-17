@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
-import clientPromise from '../../../lib/mongodb';
+import { connectToDB } from '@/lib/mongodb';
 
 const saltRounds = 10;
 
@@ -12,8 +12,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 });
     }
 
-    const client = await clientPromise;
-    const db = client.db();
+    const db = await connectToDB();
     const users = db.collection('users');
 
     // 1) Check if already registered
