@@ -42,8 +42,12 @@ const RegisterPage: React.FC = () => {
       } else {
         setError(resData.error || "Something went wrong");
       }
-    } catch (_error) {
-      console.error(_error);
+    } catch (_error: unknown) {
+      if (_error instanceof Error) {
+        console.error(_error.message);
+      } else {
+        console.error(_error);
+      }
       setError("Something went wrong");
     }
   };
