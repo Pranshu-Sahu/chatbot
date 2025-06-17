@@ -38,7 +38,7 @@ const RegisterPage: React.FC = () => {
       } else {
         setError(resData.error || 'Something went wrong');
       }
-    } catch () {
+    } catch (_){
       setError('Something went wrong');
     }
   };

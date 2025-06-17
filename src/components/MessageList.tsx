@@ -1,9 +1,16 @@
-import MessageItem, { Message } from './MessageItem';
+// src/components/MessageList.tsx
 
-export default function MessageList({ messages }: { messages: Message[] }) {
+import MessageItem from './MessageItem';
+import { Message } from './ChatContainer';    // ← pull the type from ChatContainer, where you actually declared it
+
+interface MessageListProps {
+  messages: Message[];
+}
+
+export default function MessageList({ messages }: MessageListProps) {
   return (
     <>
-      {messages.map(msg => (
+      {messages.map((msg) => (
         <MessageItem key={msg.id} message={msg} />
       ))}
     </>

@@ -26,9 +26,12 @@ function ChatContainer() {
     setMessages(prev => [...prev, userMsg]);
 
     // 2. TODO: call your chat API / dummy backend
-    const botReply = { id: (Date.now()+1).toString(), text: 'Typing...', sender: 'bot' };
-    setMessages(prev => [...prev, botReply]);
-
+    
+const botReply: Message = {
+  id: (Date.now()+1).toString(),
+  text: 'Typing...',
+  sender: 'bot'
+};
     // simulate response
     setTimeout(() => {
       setMessages(prev =>
