@@ -1,5 +1,5 @@
 // src/lib/mongodb.ts
-import { MongoClient } from 'mongodb';
+import { MongoClient, Db } from 'mongodb';
 
 const uri = process.env.MONGODB_URI;
 if (!uri) {
@@ -22,7 +22,7 @@ const clientPromise: Promise<MongoClient> =
       client.connect();
 
 // 3️⃣ Export a helper to get the connected DB
-export async function connectToDB() {
+export async function connectToDB(): Promise<Db> {
   const conn = await clientPromise;
   return conn.db();
 }

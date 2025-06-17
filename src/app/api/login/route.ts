@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
 import { signToken } from '@/lib/jwt';
 import { connectToDB } from '@/lib/mongodb';
+import { ObjectId } from 'mongodb';
 
 interface LoginBody {
   email: string;
@@ -16,7 +17,12 @@ export async function POST(request: NextRequest) {
 
     // 2️⃣ lookup user in DB
     const db = await connectToDB();
-    const user = await db.collection('users').findOne({ email });
+    interface User {
+      _id: ObjectId;
+      email: string;
+      passwordHash: string;
+    }
+    const user = await db.collection<User>('users').findOne({ email });
     if (!user) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
