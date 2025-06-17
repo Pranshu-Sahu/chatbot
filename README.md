@@ -1,4 +1,4 @@
-# 💬 Chatbot Web App (Internship Assignment)
+# 💬 Chatbot Web App
 
 A production-ready chatbot web application built with **Next.js (App Router)**, **Tailwind CSS**, and **JWT-based authentication**. The app features a real-time message stream between a user and a dummy AI bot backend.
 
