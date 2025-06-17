@@ -35,7 +35,8 @@ export default function LoginPage() {
       } else {
         setError(resData.error || 'Login failed');
       }
-    } catch (_) {
+    } catch (_error) {
+      console.error(_error);
       setError('Something went wrong');
     }
   };
