@@ -1,11 +1,29 @@
+// src/lib/mongodb.ts
 import { MongoClient } from 'mongodb';
 
 const uri = process.env.MONGODB_URI;
 if (!uri) {
-  throw new Error('Please define the MONGODB_URI environment variable in .env.local');
+  throw new Error('Please add your MongoDB URI to .env.local');
 }
+const options = {};
 
-const client: MongoClient = new MongoClient(uri);
-const clientPromise: Promise<MongoClient> = client.connect();
+// 1️⃣ Create your single MongoClient instance
+const client = new MongoClient(uri, options);
 
-export default clientPromise;
+// 2️⃣ Cache the connection promise on global (only in dev)
+declare global {
+  // eslint-disable-next-line no-var
+  var _mongoClientPromise: Promise<MongoClient>;
+}
+const clientPromise: Promise<MongoClient> =
+  process.env.NODE_ENV === 'development'
+    ? // Reuse existing promise in dev to avoid hot-reload issues
+      global._mongoClientPromise ?? (global._mongoClientPromise = client.connect())
+    : // In prod, just connect once
+      client.connect();
+
+// 3️⃣ Export a helper to get the connected DB
+export async function connectToDB() {
+  const conn = await clientPromise;
+  return conn.db();
+}

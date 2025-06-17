@@ -1,39 +1,41 @@
-import { NextResponse } from 'next/server';
+// src/app/api/login/route.ts
+import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
-import clientPromise from '../../../lib/mongodb';
-import { signToken } from '../../../lib/jwt';
+import { signToken } from '@/lib/jwt';
+import { connectToDB } from '@/lib/mongodb';
 
-export async function POST(request: Request) {
+interface LoginBody {
+  email: string;
+  password: string;
+}
+
+export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json();
+    // 1️⃣ parse & validate body
+    const { email, password } = (await request.json()) as LoginBody;
 
-    if (!email || !password) {
-      return NextResponse.json({ error: 'Email and password required' }, { status: 400 });
-    }
-
-    const client = await clientPromise;
-    const db = client.db();
-    const users = db.collection('users');
-
-    // 1) Find the user
-    const user = await users.findOne<{ _id: any; password: string }>({ email });
+    // 2️⃣ lookup user in DB
+    const db = await connectToDB();
+    const user = await db.collection('users').findOne({ email });
     if (!user) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    // 2) Verify password
-    const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid) {
+    // 3️⃣ verify password
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!isMatch) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    // 3) Sign a JWT
+    // 4️⃣ sign & return token
     const token = signToken({ userId: user._id.toString() });
+    return NextResponse.json({ token });
 
-    // 4) Return it to the client
-    return NextResponse.json({ token }, { status: 200 });
-  } catch (err) {
-    console.error('Login error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  } catch (err: unknown) {
+    console.error(err);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

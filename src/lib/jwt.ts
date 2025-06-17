@@ -1,11 +1,11 @@
 // src/lib/jwt.ts
-import jwt, { Secret, SignOptions } from 'jsonwebtoken';
+import jwt, { Secret, SignOptions, JwtPayload } from "jsonwebtoken";
 
 // 1️⃣ Pull the raw env var
 const _secret = process.env.JWT_SECRET;
 if (!_secret) {
   throw new Error(
-    'Please define the JWT_SECRET environment variable in .env.local'
+    "Please define the JWT_SECRET environment variable in .env.local"
   );
 }
 
@@ -16,13 +16,12 @@ const secret: Secret = _secret;
 export function signToken(
   payload: object,
   // you can even tie this default to the same SignOptions type:
-  expiresIn: SignOptions['expiresIn'] = '1h'
+  expiresIn: SignOptions["expiresIn"] = "1h"
 ): string {
   const options: SignOptions = { expiresIn };
   return jwt.sign(payload, secret, options);
 }
 
-export function verifyToken<T = any>(token: string): T {
-  // you can also pass in the same options object here if you like
-  return jwt.verify(token, secret) as T;
+export function verifyToken(token: string): JwtPayload {
+  return jwt.verify(token, secret) as JwtPayload;
 }
