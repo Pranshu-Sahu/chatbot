@@ -20,32 +20,43 @@ function ChatContainer() {
   }, [messages]);
 
   const sendMessage = async (text: string) => {
+     console.log('sendMessage called with:', text);
     if (!text.trim()) return;
-    // 1. Add user message
+
+    // 1️⃣ Add user message
     const userMsg: Message = { id: Date.now().toString(), text, sender: 'user' };
     setMessages(prev => [...prev, userMsg]);
 
-    // 2. TODO: call your chat API / dummy backend
-    
-const botReply: Message = {
-  id: (Date.now()+1).toString(),
-  text: 'Typing...',
-  sender: 'bot'
-};
-    // simulate response
-    setTimeout(() => {
-      setMessages(prev =>
-        prev.map(m =>
-          m.id === botReply.id
-            ? { ...m, text: 'Hello! This is a dummy response.' }
-            : m
-        )
-      );
-    }, 1000);
+    // 2️⃣ Call chat API
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text }),
+      });
+      const data = await res.json();
+
+      // 3️⃣ Add bot reply
+      const botMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        text: data.response || 'No response',
+        sender: 'bot',
+      };
+
+      setMessages(prev => [...prev, botMsg]);
+    } catch (err) {
+      console.error('Chat API error:', err);
+      const errorMsg: Message = {
+        id: (Date.now() + 2).toString(),
+        text: 'Error: Could not get response',
+        sender: 'bot',
+      };
+      setMessages(prev => [...prev, errorMsg]);
+    }
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-800">
+    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-800">
       <div ref={listRef} className="flex-1 overflow-auto p-4">
         <MessageList messages={messages} />
       </div>
@@ -55,4 +66,5 @@ const botReply: Message = {
     </div>
   );
 }
+
 export default ChatContainer;
